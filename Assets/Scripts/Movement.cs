@@ -2,7 +2,7 @@ using Cinemachine;
 using Photon.Pun;
 using UnityEngine;
 
-public class Movement : MonoBehaviour
+public class Movement : MonoBehaviourPunCallbacks, IPunObservable
 {
     private CharacterController controller;
     private new Transform transform;
@@ -17,6 +17,10 @@ public class Movement : MonoBehaviour
     private CinemachineVirtualCamera virtualCamera;
 
     public float moveSpeed = 10.0f;
+
+    private Vector3 receivePos;
+    private Quaternion receiveRot;
+    public float damping = 10.0f;
 
     private void Start()
     {
@@ -42,6 +46,15 @@ public class Movement : MonoBehaviour
         {
             Move();
             Turn();
+        }
+        else
+        {
+            transform.position = Vector3.Lerp(transform.position,
+                                            receivePos,
+                                            Time.deltaTime * damping);
+            transform.rotation = Quaternion.Slerp(transform.rotation,
+                                            receiveRot,
+                                            Time.deltaTime * damping);
         }
     }
 
@@ -77,5 +90,19 @@ public class Movement : MonoBehaviour
         Vector3 lookDir = hitPoint - transform.position;
         lookDir.y = 0;
         transform.localRotation = Quaternion.LookRotation(lookDir);
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(transform.position);
+            stream.SendNext(transform.rotation);
+        }
+        else
+        {
+            receivePos = (Vector3)stream.ReceiveNext();
+            receiveRot = (Quaternion)stream.ReceiveNext();
+        }
     }
 }
