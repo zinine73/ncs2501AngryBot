@@ -1,7 +1,7 @@
 using Photon.Pun;
 using UnityEngine;
-
-public class NewGameManager : MonoBehaviour
+using Photon.Realtime;
+public class NewGameManager : MonoBehaviourPunCallbacks
 {
     void Awake()
     {

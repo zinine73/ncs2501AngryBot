@@ -1,7 +1,8 @@
 using System.Collections;
+using Photon.Pun;
 using UnityEngine;
 
-public class Damage : MonoBehaviour
+public class Damage : MonoBehaviourPunCallbacks
 {
     private Renderer[] renderers;
     private const int initHp = 100;
